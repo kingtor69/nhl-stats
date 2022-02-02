@@ -12,7 +12,7 @@ SEASON_THIS = f'{str(datetime.now().year)}{str(datetime.now().year+1)}' if datet
 SEASON_LAST = f'{str(datetime.now().year-1)}{str(datetime.now().year)}' if datetime.now().month > 7 else f'{str(datetime.now().year-2)}{str(datetime.now().year-1)}'
 # assumes one season ends on or before July 31 and the next starts on or after August 1
 
-STATSAPI_NHL_TEAMS_SUFFIX = "api/v1/teams/"
+STATSAPI_NHL_TEAMS_SUFFIX = "f"
 # returns all teams or a team with ID added to URL
 STATSAPI_NHL_TEAM_ROSTER = "?expand=team.roster"
 # player_id = f"teams[0].roster.roster[{i}].person.id"
