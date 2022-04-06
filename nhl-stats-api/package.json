@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/kingtor69/nhl-stats#readme",
   "dependencies": {
+    "axios": "^0.26.1",
     "express": "^4.17.3",
     "module": "^0.0.1"
   }
