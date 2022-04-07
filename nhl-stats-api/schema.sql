@@ -1,12 +1,12 @@
 
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS players;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS players CASCADE;
 -- only contians player name and id for searching on APIs
-DROP TABLE IF EXISTS users_players;
-DROP TABLE IF EXISTS teams;
-DROP TABLE IF EXISTS users_teams;
-DROP TABLE IF EXISTS preferences;
-DROP TABLE IF EXISTS users_preferences;
+DROP TABLE IF EXISTS users_players CASCADE;
+DROP TABLE IF EXISTS teams CASCADE;
+DROP TABLE IF EXISTS users_teams CASCADE;
+DROP TABLE IF EXISTS preferences CASCADE;
+DROP TABLE IF EXISTS users_preferences CASCADE;
 
 CREATE TABLE users (
     username VARCHAR(24) PRIMARY KEY,
@@ -43,8 +43,8 @@ CREATE TABLE users_teams (
 
 CREATE TABLE preferences (
     username VARCHAR(24) PRIMARY KEY,
-    is_dark_mode BOOLEAN NOT NULL DEFAULT t,
-    is_metric BOOLEAN NOT NULL DEFAULT f
+    is_dark_mode BOOLEAN NOT NULL DEFAULT 'true',
+    is_metric BOOLEAN NOT NULL DEFAULT 'false'
 );
 
 
