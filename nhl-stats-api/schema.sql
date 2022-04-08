@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS users_players CASCADE;
 DROP TABLE IF EXISTS teams CASCADE;
 DROP TABLE IF EXISTS users_teams CASCADE;
 DROP TABLE IF EXISTS preferences CASCADE;
-DROP TABLE IF EXISTS users_preferences CASCADE;
 
 CREATE TABLE users (
     username VARCHAR(24) PRIMARY KEY,
@@ -14,13 +13,8 @@ CREATE TABLE users (
     password VARCHAR(48) NOT NULL,
     first_name VARCHAR(48),
     last_name VARCHAR(48),
-    bio VARCHAR(256)
-);
-
-CREATE TABLE players (
-    id INT PRIMARY KEY,
-    name VARCHAR(48) NOT NULL,
-    team_id INT NOT NULL
+    bio VARCHAR(256),
+    is_admin BOOLEAN NOT NULL DEFAULT 'false'
 );
 
 CREATE TABLE teams (
@@ -29,35 +23,27 @@ CREATE TABLE teams (
     mascot VARCHAR(48) NOT NULL
 );
 
+CREATE TABLE players (
+    id INT PRIMARY KEY,
+    name VARCHAR(48) NOT NULL,
+    team_id INT NOT NULL REFERENCES teams(id)
+);
+
 CREATE TABLE users_players (
     id SERIAL PRIMARY KEY,
-    player_id INT,
-    username VARCHAR(24) 
+    player_id INT NOT NULL REFERENCES players(id),
+    user_name VARCHAR(24) NOT NULL REFERENCES users(username)
 );
 
 CREATE TABLE users_teams (
     id SERIAL PRIMARY KEY,
-    team_id INT,
-    username VARCHAR(24)
+    team_id INT NOT NULL REFERENCES teams(id),
+    user_name VARCHAR(24) NOT NULL REFERENCES users(username)
 );
 
 CREATE TABLE preferences (
-    username VARCHAR(24) PRIMARY KEY,
+    user_name VARCHAR(24) PRIMARY KEY REFERENCES users(username),
     is_dark_mode BOOLEAN NOT NULL DEFAULT 'true',
     is_metric BOOLEAN NOT NULL DEFAULT 'false'
 );
 
-
-ALTER TABLE teams 
-    ADD FOREIGN KEY (team_id) REFERENCES teams(id);
-
-ALTER TABLE users_players 
-     ADD FOREIGN KEY (players_id) REFERENCES players(id),
-     ADD FOREIGN KEY (username) REFERENCES users(usename);
-
-ALTER TABLE users_teams 
-    ADD FOREIGN KEY (team_id) REFERENCES teams(id),
-    ADD FOREIGN KEY (username) REFERENCES users(username);
-
-ALTER TABLE preferences 
-    ADD FOREIGN KEY (username) REFERENCES users(username);

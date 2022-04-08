@@ -26,7 +26,10 @@
   "homepage": "https://github.com/kingtor69/nhl-stats#readme",
   "dependencies": {
     "axios": "^0.26.1",
+    "bcrypt": "^5.0.1",
+    "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "module": "^0.0.1"
+    "module": "^0.0.1",
+    "pg": "^8.7.3"
   }
 }
