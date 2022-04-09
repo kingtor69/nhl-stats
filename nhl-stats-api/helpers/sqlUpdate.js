@@ -1,5 +1,5 @@
 
-const sqlUpdate = (table, data, pKeyName, pKey) {
+const sqlUpdate = (table, data, pKeyName, pKey) => {
   let i = 1;
   let cols = [];
 
