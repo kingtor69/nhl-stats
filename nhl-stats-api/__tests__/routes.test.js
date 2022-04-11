@@ -22,14 +22,16 @@ beforeEach(async function() {
   }
 
   let sampleUsers = [
-    ["u1", "fn1", "ln1", "email1", "phone1", await _pwd("pwd1"), false],
-    ["u2", "fn2", "ln2", "email2", "phone2", await _pwd("pwd2"), false],
-    ["u3", "fn3", "ln3", "email3", "phone3", await _pwd("pwd3"), true]
+    ["u1", await _pwd("pwd1"), "email1", "fn1", "ln1", "bio1", false],
+    ["u2", await _pwd("pwd2"), "email2", "fn2", "ln2", "bio2", false],
+    ["u3", await _pwd("pwd3"), "email3", "fn3", "ln3", "bio3", true]
   ];
 
   for (let user of sampleUsers) {
     await db.query(
-      `INSERT INTO users VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      `INSERT INTO users
+        (username, email, password, first_name, last_name, bio, is_admin) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       user
     );
     tokens[user[0]] = createToken(user[0], user[6]);
@@ -43,10 +45,10 @@ describe("POST /auth/register", function() {
       .send({
         username: "new_user",
         password: "new_password",
+        email: "new@newuser.com",
         first_name: "new_first",
         last_name: "new_last",
-        email: "new@newuser.com",
-        phone: "1233211221"
+        bio: "bio"
       });
     expect(response.statusCode).toBe(201);
     expect(response.body).toEqual({ token: expect.any(String) });
@@ -62,11 +64,11 @@ describe("POST /auth/register", function() {
       .post("/auth/register")
       .send({
         username: "u1",
+        bio: "14933139480982",
         password: "potato",
         first_name: "Double",
         last_name: "Doppel",
-        email: "kartoffel@pub.com",
-        phone: "14933139480982"
+        email: "kartoffel@pub.com"
       });
     expect(resp.statusCode).toBe(401);
   });  
@@ -147,10 +149,10 @@ describe("GET /users/[username]", function() {
     expect(response.statusCode).toBe(200);
     expect(response.body.user).toEqual({
       username: "u1",
+      email: "email1",
       first_name: "fn1",
       last_name: "ln1",
-      email: "email1",
-      phone: "phone1"
+      bio: "bio"
     });
   });
 
