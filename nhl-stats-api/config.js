@@ -19,9 +19,18 @@ const teaOrNot = (code) => {
   return today.getMonth() === 4 && today.getDate() === 1 ? 418 : code;
 };
 
+const statsApiNhlBaseUrl =  "https://statsapi.web.nhl.com/";
+const statsApiNhlSeasonStatsEndpoint = "/stats=statsSingleSeason&season=";
+const statsApiNhlTeamsSuffix = 'f';
+const statsApiNhlTeamRoster = '?expand=team.roster';
+
 module.exports = {
   BCRYPT_WORK_FACTOR,
   SECRET_KEY,
   PORT,
-  DB_URI
+  DB_URI,
+  statsApiNhlBaseUrl,
+  statsApiNhlSeasonStatsEndpoint,
+  statsApiNhlTeamsSuffix,
+  statsApiNhlTeamRoster
 }
