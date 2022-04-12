@@ -5,7 +5,7 @@ const SECRET_KEY = process.env.SECRET_KEY || 'development-not-so-secret-key';
 
 const PORT = process.env.PORT || 3001;
 
-let DB_URI = `postgresw://postgres:${process.env.PSQL}@localhost:5432/nhl_stats_app`;
+let DB_URI = `postgres://postgres:${process.env.PSQL}@localhost:5432/nhl_stats_app`;
 
 let BCRYPT_WORK_FACTOR = 12;
 
