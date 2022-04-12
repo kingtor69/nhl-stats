@@ -6,8 +6,10 @@ const ExpressError = require('./helpers/expressError');
 app.use(express.json());
 
 const userRoutes = require('./routes/users');
+const statsRoutes = require('./routes/stats');
 
 app.use('/users', userRoutes);
+app.use('/stats', statsRoutes);
 
 // 404 handler
 app.use ((req, res, next) => {

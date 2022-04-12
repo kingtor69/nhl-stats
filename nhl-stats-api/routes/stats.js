@@ -11,8 +11,8 @@ const {
   statsApiNhlTeamRoster
 } = require('../apiData');
 
-router.get('/', async function(req, res, next) {
+router.get('/', function(req, res, next) {
   return {'test':'one two one two'}
 });
 
-module.export = router;
+module.exports = router;
