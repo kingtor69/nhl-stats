@@ -1,5 +1,3 @@
-// Set ENV VAR to test before we load anything, so our app's config will use
-// testing settings
 
 process.env.NODE_ENV = "test";
 
@@ -14,23 +12,21 @@ const { SECRET_KEY } = require("../config");
 // tokens for our sample users
 const tokens = {};
 
-/** before each test, insert u1, u2, and u3  [u3 is admin] */
-
 beforeEach(async function() {
   async function _pwd(password) {
     return await bcrypt.hash(password, 1);
   }
 
   let sampleUsers = [
-    ["u1", await _pwd("pwd1"), "email1", "fn1", "ln1", "bio1", false],
-    ["u2", await _pwd("pwd2"), "email2", "fn2", "ln2", "bio2", false],
-    ["u3", await _pwd("pwd3"), "email3", "fn3", "ln3", "bio3", true]
+    ["u1", await _pwd("pwd1"), "email1", "first1", "last1", "bio1", false],
+    ["u2", await _pwd("pwd2"), "email2", "first2", "last2", "bio2", false],
+    ["u3", await _pwd("pwd3"), "email3", "first3", "last3", "bio3", true]
   ];
 
   for (let user of sampleUsers) {
     await db.query(
       `INSERT INTO users
-        (username, email, password, first_name, last_name, bio, is_admin) 
+        (username, password, email, first_name, last_name, bio, is_admin) 
         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       user
     );
@@ -38,8 +34,14 @@ beforeEach(async function() {
   }
 });
 
+describe('does beforeEach even work?', () => {
+  it('should pass this stupid test', () => {
+    expect(true).toBe(true);
+  })
+});
+
 describe("POST /auth/register", function() {
-  test("should allow a user to register in", async function() {
+  it("should allow a new user to register", async function() {
     const response = await request(app)
       .post("/auth/register")
       .send({
@@ -58,24 +60,23 @@ describe("POST /auth/register", function() {
     expect(admin).toBe(false);
   });
 
-  // tests bug #1
-  test("should not allow a user to register with an existing username", async () => {
+  it("should not allow a user to register with an existing username", async () => {
     const resp = await request(app)
       .post("/auth/register")
       .send({
         username: "u1",
-        bio: "14933139480982",
         password: "potato",
-        first_name: "Double",
-        last_name: "Doppel",
-        email: "kartoffel@pub.com"
+        email: "kartoffel@pub.com",
+        first_name: "Doppel",
+        last_name: "Ganger",
+        bio: "I like potatoes."
       });
-    expect(resp.statusCode).toBe(401);
+      expect(resp.statusCode).toBe(401);
   });  
 });
 
 describe("POST /auth/login", () => {
-  test("should return a token for a correct username/password login attempt", async () => {
+  it("should return a token for a correct username/password login attempt", async () => {
     const resp = await request(app)
       .post("/auth/login")
       .send({
@@ -86,8 +87,7 @@ describe("POST /auth/login", () => {
     expect(resp.body.token).toBeTruthy();
   });
 
-  // tests bug #2
-  test("should return 401 and *no* token when passed incorrect credentials", async () => {
+  it("should return 401 and *no* token when passed incorrect credentials", async () => {
     const wrongUser = await request(app)
       .post("/auth/login")
       .send({
@@ -108,12 +108,12 @@ describe("POST /auth/login", () => {
 });
 
 describe("GET /users", function() {
-  test("should deny access if no token provided", async function() {
+  it("should deny access if no token provided", async function() {
     const response = await request(app).get("/users");
     expect(response.statusCode).toBe(401);
   });
 
-  test("should list all users", async function() {
+  it("should list all users", async function() {
     const response = await request(app)
       .get("/users")
       .send({ _token: tokens.u1 });
@@ -123,26 +123,26 @@ describe("GET /users", function() {
 });
 
 describe("GET /users/[username]", function() {
-  test("should deny access if no token provided", async function() {
+  it("should deny access if no token provided", async function() {
     const response = await request(app).get("/users/u1");
     expect(response.statusCode).toBe(401);
   });
 
-  test("should return data on u1 TO u1", async function() {
+  it("should return data on u1 TO u1", async function() {
     const response = await request(app)
       .get("/users/u1")
       .send({ _token: tokens.u1 });
     expect(response.statusCode).toBe(200);
     expect(response.body.user).toEqual({
       username: "u1",
-      first_name: "fn1",
-      last_name: "ln1",
+      first_name: "first1",
+      last_name: "last1",
       email: "email1",
       phone: "phone1"
     });
   });
 
-  test("should return data on u1 TO u3 (admin)", async function() {
+  it("should return data on u1 TO u3 (admin)", async function() {
     const response = await request(app)
       .get("/users/u1")
       .send({ _token: tokens.u3 });
@@ -150,37 +150,34 @@ describe("GET /users/[username]", function() {
     expect(response.body.user).toEqual({
       username: "u1",
       email: "email1",
-      first_name: "fn1",
-      last_name: "ln1",
+      first_name: "first1",
+      last_name: "last1",
       bio: "bio"
     });
   });
 
-  // tests bug #3
-  test("should return 404 for bad username", async() => {
+  it("should return 404 for bad username", async() => {
     const response = await request(app)
       .get("/users/nope")
       .send({ _token: tokens.u3 });
     expect(response.statusCode).toBe(404);
   });
 
-  // tests bug #4
-  test("should 401 u1's data to u2", async() => {
+  it("should 401 u1's data to u2", async() => {
     const response = await request(app)
       .get("/users/u1")
       .send({ _token: tokens.u2 });
     expect(response.statusCode).toBe(401);
   });
 
-  // this is to fix bug #5
-  test("fradulent token should be denied", async () => {
+  it("should deny a fraudulent token", async () => {
     const bogusToken = {
       header: "who cares?",
       payload: {
         username: "u1",
         admin: true
       },
-      signature: "somethingthatwillnotmatch"
+      signature: "somethingthatwillastotmatch"
     };
     const response = await request(app)
       .get("/users/u2")
@@ -190,27 +187,27 @@ describe("GET /users/[username]", function() {
 });
 
 describe("PATCH /users/[username]", function() {
-  test("should deny access if no token provided", async function() {
+  it("should deny access if no token provided", async function() {
     const response = await request(app).patch("/users/u1");
     expect(response.statusCode).toBe(401);
   });
 
-  test("should deny access if not admin/right user", async function() {
+  it("should deny access if not admin/right user", async function() {
     const response = await request(app)
       .patch("/users/u1")
       .send({ _token: tokens.u2 }); // wrong user!
     expect(response.statusCode).toBe(401);
   });
 
-  test("should patch data if admin", async function() {
+  it("should patch data if admin", async function() {
     const response = await request(app)
       .patch("/users/u1")
-      .send({ _token: tokens.u3, first_name: "new-fn1" }); // u3 is admin
+      .send({ _token: tokens.u3, first_name: "new-first1" }); // u3 is admin
     expect(response.statusCode).toBe(200);
     expect(response.body.user).toEqual({
       username: "u1",
-      first_name: "new-fn1",
-      last_name: "ln1",
+      first_name: "new-first1",
+      last_name: "last1",
       email: "email1",
       phone: "phone1",
       admin: false,
@@ -218,35 +215,35 @@ describe("PATCH /users/[username]", function() {
     });
   });
 
-  test("should disallowing patching not-allowed-fields", async function() {
+  it("should disallowing patching not-allowed-fields", async function() {
     const response = await request(app)
       .patch("/users/u1")
       .send({ _token: tokens.u1, admin: true });
     expect(response.statusCode).toBe(401);
   });
 
-  test("should return 404 if cannot find", async function() {
+  it("should return 404 if cannot find", async function() {
     const response = await request(app)
       .patch("/users/not-a-user")
-      .send({ _token: tokens.u3, first_name: "new-fn" }); // u3 is admin
+      .send({ _token: tokens.u3, first_name: "new-first" }); // u3 is admin
     expect(response.statusCode).toBe(404);
   });
 });
 
 describe("DELETE /users/[username]", function() {
-  test("should deny access if no token provided", async function() {
+  it("should deny access if no token provided", async function() {
     const response = await request(app).delete("/users/u1");
     expect(response.statusCode).toBe(401);
   });
 
-  test("should deny access if not admin", async function() {
+  it("should deny access if not admin", async function() {
     const response = await request(app)
       .delete("/users/u1")
       .send({ _token: tokens.u1 });
     expect(response.statusCode).toBe(401);
   });
 
-  test("should allow if admin", async function() {
+  it("should allow if admin", async function() {
     const response = await request(app)
       .delete("/users/u1")
       .send({ _token: tokens.u3 }); // u3 is admin

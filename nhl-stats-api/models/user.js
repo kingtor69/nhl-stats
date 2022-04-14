@@ -25,9 +25,9 @@ class User {
       
     const result = await db.query(
       `INSERT INTO users
-        (username, email, password, first_name, last_name, bio)
+        (username, password, email, first_name, last_name, bio)
         VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING username, email, password, first_name, last_name, bio`,
+        RETURNING username, password, email, first_name, last_name, bio`,
         [
           username,
           email,
@@ -44,11 +44,7 @@ class User {
   static async authenticate(username, password) {
     const result = await db.query(
       `SELECT username,
-              email,
               password,
-              first_name,
-              last_name,
-              bio,
               is_admin
         FROM users
         WHERE username = $1`,

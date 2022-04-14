@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS preferences CASCADE;
 CREATE TABLE users (
     username VARCHAR(24) PRIMARY KEY,
     email VARCHAR(50),
-    password VARCHAR(48) NOT NULL,
+    password VARCHAR(60) NOT NULL,
     first_name VARCHAR(48),
     last_name VARCHAR(48),
     bio VARCHAR(256),

@@ -5,11 +5,13 @@ const ExpressError = require('../helpers/expressError');
 const { 
   statsApiNHLBaseUrl,
   statsApiNhlSeasonStatsEndpoint,
-  thisSeason,
-  lastSeason,
   statsApiNhlTeamsSuffix,
   statsApiNhlTeamRoster
-} = require('../apiData');
+} = require('../config');
+const {
+  thisSeason,
+  lastSeason
+} = require('../models/stats');
 
 router.get('/', function(req, res, next) {
   return {'test':'one two one two'}
