@@ -41,7 +41,7 @@ class User {
   };
 
   static async authenticate(username, password) {
-    const result = await db.query(
+    const results = await db.query(
       `SELECT username,
               password,
               is_admin
