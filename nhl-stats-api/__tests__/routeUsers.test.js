@@ -37,12 +37,20 @@ beforeEach(async function() {
 describe('does beforeEach even work?', () => {
   it('should pass this stupid test', () => {
     expect(true).toBe(true);
-  })
+  });
+
+  it('should have 3 users in the test database', async () => {
+    const response = await db.query(
+      `SELECT username FROM users`
+    );
+    const users = response.rows;
+    expect(users.length).toBe(3);
+  });
 });
 
 describe("POST /auth/register", function() {
-  it("should allow a new user to register", async function() {
-    const response = await request(app)
+  it("should allow a new user to register", async () => {
+    const resp = await request(app)
       .post("/auth/register")
       .send({
         username: "new_user",
@@ -52,10 +60,10 @@ describe("POST /auth/register", function() {
         last_name: "new_last",
         bio: "bio"
       });
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toEqual({ token: expect.any(String) });
+    expect(resp.statusCode).toBe(201);
+    expect(resp.body).toEqual({ token: expect.any(String) });
 
-    let { username, admin } = jwt.verify(response.body.token, SECRET_KEY);
+    let { username, admin } = jwt.verify(resp.body.token, SECRET_KEY);
     expect(username).toBe("new_user");
     expect(admin).toBe(false);
   });
@@ -71,7 +79,7 @@ describe("POST /auth/register", function() {
         last_name: "Ganger",
         bio: "I like potatoes."
       });
-      expect(resp.statusCode).toBe(401);
+    expect(resp.statusCode).toBe(401);
   });  
 });
 

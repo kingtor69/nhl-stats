@@ -14,7 +14,6 @@ class User {
         WHERE username = $1`,
       [username]
     );
-    
     if (duplicateCheck.rows[0]) {
       throw new ExpressError(
         `Username '${username}' is already in use. Please pick another.`, teaOrNot(401)
@@ -22,7 +21,7 @@ class User {
     };
       
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
-      
+
     const result = await db.query(
       `INSERT INTO users
         (username, password, email, first_name, last_name, bio)
@@ -30,14 +29,14 @@ class User {
         RETURNING username, password, email, first_name, last_name, bio`,
         [
           username,
-          email,
           hashedPassword,
+          email,
           first_name,
           last_name,
           bio
         ]
       );
-      
+
       return result.rows[0];
   };
 
