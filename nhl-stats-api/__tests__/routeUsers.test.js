@@ -12,7 +12,12 @@ const { SECRET_KEY } = require("../config");
 // tokens for our sample users
 const tokens = {};
 
-beforeEach(async function() {
+beforeAll(async () => {
+  db.connect();
+  await db.query("DELETE FROM users");
+});
+
+beforeEach(async () => {
   async function _pwd(password) {
     return await bcrypt.hash(password, 1);
   }
@@ -121,22 +126,49 @@ describe("GET /users", function() {
     expect(response.statusCode).toBe(401);
   });
 
-  it("should list all users", async function() {
+  it("should return a list all-users long for any get /users request", async () => {
     const response = await request(app)
-      .get("/users")
-      .send({ _token: tokens.u1 });
-    expect(response.statusCode).toBe(200);
-    expect(response.body.users.length).toBe(3);
+    .get("/users")
+  expect(response.statusCode).toBe(200);
+  expect(response.body.users.length).toBe(3);
   });
+
+  // it("should list all users with appropriate data for any logged-in user", async () => {
+  //   const response = await request(app)
+  //     .get("/users")
+  //     .send({ _token: tokens.u1 });
+  //   expect(response.statusCode).toBe(200);
+  //   expect(response.body.users.length).toBe(3);
+  //   expect(Object.keys(response.body.users[0]).toEqual(expect.arrayContaining(['username', 'email'])));
+  //   expect(Object.keys(response.body.users[0]).not.toEqual(expect.arrayContaining(['is_admin'])));
+  // });
+
+  // it("should list all users with appropriate data for logged-in *admin* user", async () => {
+  //   const response = await request(app)
+  //     .get("/users")
+  //     .send({ _token: tokens.u1 });
+  //   expect(response.statusCode).toBe(200);
+  //   expect(response.body.users.length).toBe(3);
+  //   expect(Object.keys(response.body.users[0]).toEqual(expect.arrayContaining(['username', 'email', 'is_admin'])));
+  // });
+
+  // it("should return an abbreviated list of all users when no user is logged in", async () => {
+  //   const response = await request(app)
+  //     .get("/users");
+  //   expect(response.statusCode).toBe(200);
+  //   expect(response.body.users.length).toBe(3);
+  //   expect(Object.keys(response.body.users[0]).toEqual(expect.arrayContaining(['username'])));
+  //   expect(Object.keys(response.body.users[0]).toEqual(expect.not.arrayContaining(['email'])));
+  // });
 });
 
-describe("GET /users/[username]", function() {
-  it("should deny access if no token provided", async function() {
+describe("GET /users/[username]", () => {
+  it("should deny access if no token provided", async () => {
     const response = await request(app).get("/users/u1");
     expect(response.statusCode).toBe(401);
   });
 
-  it("should return data on u1 TO u1", async function() {
+  it("should return data on u1 TO u1", async () => {
     const response = await request(app)
       .get("/users/u1")
       .send({ _token: tokens.u1 });
@@ -146,11 +178,11 @@ describe("GET /users/[username]", function() {
       first_name: "first1",
       last_name: "last1",
       email: "email1",
-      phone: "phone1"
+      bio: "bio1"
     });
   });
 
-  it("should return data on u1 TO u3 (admin)", async function() {
+  it("should return data on u1 TO u3 (admin)", async () => {
     const response = await request(app)
       .get("/users/u1")
       .send({ _token: tokens.u3 });
@@ -160,7 +192,7 @@ describe("GET /users/[username]", function() {
       email: "email1",
       first_name: "first1",
       last_name: "last1",
-      bio: "bio"
+      bio: "bio1"
     });
   });
 
@@ -260,10 +292,10 @@ describe("DELETE /users/[username]", function() {
   });
 });
 
-afterEach(async function() {
+afterEach(async () => {
   await db.query("DELETE FROM users");
 });
 
-afterAll(function() {
+afterAll(() => {
   db.end();
 });
