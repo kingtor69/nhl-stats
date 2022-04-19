@@ -33,6 +33,6 @@ nodemon server.js
 
 ### to run tests
 ```
-npm run test -- --watch
+npm run test -- --runInBand --watch
 ```
 
