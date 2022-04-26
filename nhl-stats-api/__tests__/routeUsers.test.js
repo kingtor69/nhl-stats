@@ -12,11 +12,6 @@ const { SECRET_KEY } = require("../config");
 // tokens for our sample users
 const tokens = {};
 
-beforeAll(async () => {
-  db.connect();
-  await db.query("DELETE FROM users");
-});
-
 beforeEach(async () => {
   async function _pwd(password) {
     return await bcrypt.hash(password, 1);
