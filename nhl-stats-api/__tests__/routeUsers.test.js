@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 
 // tokens for our sample users
-const tokens = {};
+const tokens = { guest: createToken( 'guest', false ) };
 
 beforeEach(async () => {
   async function _pwd(password) {
@@ -117,44 +117,42 @@ describe("POST /auth/login", () => {
 
 describe("GET /users", function() {
   it("should deny access if no token provided", async function() {
-    const response = await request(app).get("/users");
+    const response = await request(app)
+      .get("/users");
     expect(response.statusCode).toBe(401);
   });
 
-  it("should return a list all-users long for any get /users request", async () => {
+  it("should return a list of usernames only for a 'guest' get /users request", async () => {
     const response = await request(app)
-    .get("/users")
-  expect(response.statusCode).toBe(200);
-  expect(response.body.users.length).toBe(3);
+      .get("/users")
+      .send({ _token: tokens.guest })
+    expect(response.statusCode).toBe(200);
+    expect(response.body.users.length).toBe(3);
+    expect(Object.keys(response.body.users[0])).toEqual(expect.arrayContaining(['username']));
+    expect(Object.keys(response.body.users[0])).toEqual(expect.not.arrayContaining(['email']));
+    expect(Object.keys(response.body.users[0])).toEqual(expect.not.arrayContaining(['first_name']));
+    expect(Object.keys(response.body.users[0])).toEqual(expect.not.arrayContaining(['last_name']));
   });
 
-  // it("should list all users with appropriate data for any logged-in user", async () => {
-  //   const response = await request(app)
-  //     .get("/users")
-  //     .send({ _token: tokens.u1 });
-  //   expect(response.statusCode).toBe(200);
-  //   expect(response.body.users.length).toBe(3);
-  //   expect(Object.keys(response.body.users[0]).toEqual(expect.arrayContaining(['username', 'email'])));
-  //   expect(Object.keys(response.body.users[0]).not.toEqual(expect.arrayContaining(['is_admin'])));
-  // });
+  it("should list all users with appropriate data for any logged-in user", async () => {
+    const response = await request(app)
+      .get("/users")
+      .send({ _token: tokens.u1 });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.users.length).toBe(3);
+    expect(Object.keys(response.body.users[0])).toEqual(expect.arrayContaining(['username', 'email']));
+    expect(Object.keys(response.body.users[0])).not.toEqual(expect.arrayContaining(['is_admin']));
+  });
 
-  // it("should list all users with appropriate data for logged-in *admin* user", async () => {
-  //   const response = await request(app)
-  //     .get("/users")
-  //     .send({ _token: tokens.u1 });
-  //   expect(response.statusCode).toBe(200);
-  //   expect(response.body.users.length).toBe(3);
-  //   expect(Object.keys(response.body.users[0]).toEqual(expect.arrayContaining(['username', 'email', 'is_admin'])));
-  // });
+  it("should list all users with appropriate data for logged-in *admin* user", async () => {
+    const response = await request(app)
+      .get("/users")
+      .send({ _token: tokens.u1 });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.users.length).toBe(3);
+    expect(Object.keys(response.body.users[0]).toEqual(expect.arrayContaining(['username', 'email', 'is_admin'])));
+  });
 
-  // it("should return an abbreviated list of all users when no user is logged in", async () => {
-  //   const response = await request(app)
-  //     .get("/users");
-  //   expect(response.statusCode).toBe(200);
-  //   expect(response.body.users.length).toBe(3);
-  //   expect(Object.keys(response.body.users[0]).toEqual(expect.arrayContaining(['username'])));
-  //   expect(Object.keys(response.body.users[0]).toEqual(expect.not.arrayContaining(['email'])));
-  // });
 });
 
 describe("GET /users/[username]", () => {

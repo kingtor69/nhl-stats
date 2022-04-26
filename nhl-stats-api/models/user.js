@@ -74,6 +74,16 @@ class User {
     return result.rows;
   };
 
+  static async getList() {
+    const res = await db.query(
+      `SELECT username
+      FROM users
+      ORDER BY username`
+    );
+
+    return res.rows;
+  };
+
   static async get(username) {
     const result = await db.query(
       `SELECT username,

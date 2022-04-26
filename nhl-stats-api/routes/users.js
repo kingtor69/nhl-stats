@@ -10,9 +10,14 @@ router.get('/', authUser, requireLogin, async function(req, res, next) {
   try {
     let users = await User.getAll();
     return res.json({ users });
-  } catch (err) {
-    return next(err);
-  }
+  } catch {
+    try {
+      let users = await User.getList();
+      return res.json({ users });
+    } catch (err) {
+      return next(err);
+    };
+  };
 });
 
 router.get('/:username', authUser, requireLogin, async function(
