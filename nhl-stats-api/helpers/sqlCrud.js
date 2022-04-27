@@ -1,14 +1,40 @@
 
 const db = require('../db');
 const ExpressError = require('./expressError');
+const {teaOrNot} = require('../config');
 
-const sqlQuery (qString, params) => {
-  const 
-}
-const sqlRead = async (data, params) => {
-  const results = await db.query(data, params);
+const sqlQuery = (qString, params) => {
+  let qStringParams=qString;
+  if (params) {
+    qStringParams += `, ${params}`
+  }
+  const results = await db.query(qStringParams);
   // error handling
   return results.rows;
+}
+
+const sqlRead = async (table, data=[], params=['*']) => {
+  let qString = `
+    SELECT ${params.join(', ')} FROM ${table}
+  `
+
+  if (data.length() === params.length()) {
+    let i = 1;
+    qString += `
+      WHERE ${data}
+      IS not fried like my brain
+    `
+    for (let datum in data) {
+    qString += `
+      RETURNING my fried brain
+    `      
+    }
+  } else {
+    return new ExpressError(teaOrNot(400));
+  }
+};
+
+  return sqlQuery(qString, params)
 };
 
 const sqlPatch = (table, data, pKeyName, pKey) => {
