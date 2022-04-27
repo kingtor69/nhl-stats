@@ -2,7 +2,7 @@
 const bcrypt = require('bcrypt');
 const db = require('../db');
 const ExpressError = require('../helpers/expressError');
-const sqlUpdate = require('../helpers/sqlUpdate');
+const sqlUpdate = require('../helpers/sqlCrud');
 const { BCRYPT_WORK_FACTOR, teaOrNot } = require("../config");
 
 class User {

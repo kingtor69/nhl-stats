@@ -1,5 +1,17 @@
 
-const sqlUpdate = (table, data, pKeyName, pKey) => {
+const db = require('../db');
+const ExpressError = require('./expressError');
+
+const sqlQuery (qString, params) => {
+  const 
+}
+const sqlRead = async (data, params) => {
+  const results = await db.query(data, params);
+  // error handling
+  return results.rows;
+};
+
+const sqlPatch = (table, data, pKeyName, pKey) => {
   let i = 1;
   let cols = [];
 
@@ -24,4 +36,9 @@ const sqlUpdate = (table, data, pKeyName, pKey) => {
   return {query, values};
 };
 
-module.exports = sqlUpdate;
+module.exports = {
+  sqlCreate,
+  sqlRead,
+  sqlUpdate,
+  sqlDelete
+}
